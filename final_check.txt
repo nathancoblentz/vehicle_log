@@ -1,0 +1,3 @@
+PASS: Exercise URL correct (https://www.26sp-cpt283-coblentz.beausanders.net/exercises/ch02_ex1/index.php)
+PASS: Project URL correct (https://www.26sp-cpt283-coblentz.beausanders.net/vehicle_log/projectlab0101.php)
+PASS: Under construction correct (https://www.26sp-cpt283-coblentz.beausanders.net/under_construction.php?lab=Pending+Item&amp;due=)

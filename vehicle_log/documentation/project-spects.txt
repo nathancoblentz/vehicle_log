@@ -1,0 +1,86 @@
+CPT283 Final Project Instructions Version Date:  April 19, 2018 
+Project Name: Vehicle Log 
+
+Project Purpose:  
+Vehicle Log is a maintenance management program for one of more automobiles or trucks. 
+Almost everyone has a vehicle that requires everything from gasoline to costly maintenance 
+repairs. Vehicle Log is designed to track the use and cost of all consumables as well as 
+machine maintenance. It will calculate the cost to operate a vehicle over a period of time. It will 
+help the user watch everything from how many miles per gallon they are getting to how many 
+miles a set of tires lasts. Vehicle Log can work for one vehicle or a whole fleet. 
+
+Project Database: 
+Your instructor has prepared a database for the Vehicle Log project. CPT283 students DO NOT 
+have to use this database. It was prepared to give CPT283 students a starting place to get to 
+work on their PHP interface. Students are encouraged to create their own mySQL database for 
+this project or alter the database provided by the instructor. Section 3 in our textbook starting on 
+page 505 details how to design and create mySQL databases. There are many online resources 
+to help with this as well. Google “How to create a mySQL database using phpMyAdmin” and 
+you will find many helpful sites. The instructor‘s version of the database has already been 
+installed in your lab virtual server. 
+
+Minimum Requirements: 
+ Tables for users, vehicles, maintenance_type, maintenance, and fuel 
+
+ Users should be able to lookup, add, and edit vehicles, maintenance_types, 
+maintenance, and fuel; only administrators should be able to delete anything or add, 
+edit, and delete users 
+
+ There should be a vehicle_log/admin subdirectory that is protected by an Apache 
+htaccess password where all admin interface pages will be located; the username 
+should be cpt283 and the password should be webapps 
+
+ The users tables should capture at least the user_id, first_name, last_name, 
+user_password, and email   
+
+ The maintenance table should capture the maintenance_id, maintenance_type_id, 
+and vehicle_id, and at a minimum the maintenance_vendor, 
+maintenance_description, and maintenance_cost of each maintenance event 
+
+ The fuel table should capture at a minimum the fuel_id, vehicle_id, fuel_source, 
+fuel_gallons, fuel_cost, fuel_mileage 
+
+ Users should be able to view reports on each vehicle that details the maintenance 
+events, fuel used, average mileage for consumables like fuel, oil, and tires, and the cost 
+of operation on each vehicle over a period of time 
+
+ The solution application must be well documented with comments embedded in the code 
+Extras (for extra credit): 
+
+ Roles assigned to users like admin or user; authentication for users; see “How to use 
+authentication” in Chapter 21 in our textbook 
+
+ Report options listing the details of each individual table that includes printing and 
+exporting data to a spreadsheet 
+
+CPT283 Final Project Instructions 180419.docx                                                         
+Page 1 
+CPT283: PHP Programming I 
+
+Final Project Instructions 
+ Authentication for administrators with additional features for adding/editing/deleting  
+all tables 
+ Make the application responsive for small screens by using Twitter’s Bootstrap 
+ Use MVC pattern in code development 
+ Embed an online HTML editor like TinyMCE 
+ CPT283 student added extra feature not specified in the Final Project assignment 
+Application Structure: 
+In an effort to leave CPT283 students as much flexibility as possible, the application structure 
+expectations are limited to the following: 
+ The interface must be original PHP code written by the CPT283 student submitting the 
+project; do not use any non-original utilities or other code not created by you in your 
+project unless expressly approved by your instructor (i.e. Bootstrap, TinyMCE, etc.) 
+ The database must be in mySQL and be named vehicle_log 
+ Develop the project on your assigned CPT283 virtual server; create a directory named 
+vehicle_log in the document root of your web server ( /var/www/html/vehicle_log ) 
+which will contain all of your PHP, HTML, and CSS files 
+Disclaimer: 
+Your instructor reserves the right to change these instructions as necessary at any time. 
+CPT283 students will be notified of any changes by way of email and announcements on our 
+Blackboard class page.  
+Questions and Suggestions: 
+Your feedback about the final project is encouraged. Address all questions and/or suggestions 
+to your instructor at sandewbs@my.gvltec.edu. 
+Attachments: 
+Final Project Grading Rubric 
+vehicle_log.sql printout

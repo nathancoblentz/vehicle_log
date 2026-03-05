@@ -1,0 +1,36 @@
+#v-pills-tab .nav-link {
+    border-radius:0;
+    height:100px;
+    width:100px;
+}
+
+#v-pills-tabContent {
+    padding-top: 0 !important;
+}
+
+#v-pills-tabContent .tab-pane {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+* {
+    border-radius:0 !important;
+}
+
+/* Smooth hover transition for all tabs */
+#v-pills-tab .nav-link {
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect only on inactive tabs */
+#v-pills-tab .nav-link:not(.active):hover {
+    background: var(--bs-primary);
+    cursor: pointer; /* pointer only for hoverable tabs */
+}
+
+/* Active tab styling */
+#v-pills-tab .nav-link.active {
+    background: var(--bs-info);
+    color: #fff;           /* ensure text is readable */
+    cursor: default;       /* no pointer for active tab */
+}

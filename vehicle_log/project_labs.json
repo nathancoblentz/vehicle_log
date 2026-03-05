@@ -1,0 +1,117 @@
+[
+
+{
+"filename": "index.php",
+"header": "Final Project Index",
+"title": "Final Project Index and Progress Tracker",
+"description": "Index page for the final project with a progress tracker",
+"status": "Completed",
+"due date": "2026-02-15"
+},
+
+{
+"filename": "projectlab0101.php",
+"header": "Final Project Lab 1.1",
+"title": "Making a Project Plan",
+"description": "Getting started with project planning",
+"status": "Completed",
+"due date": "2026-02-01"
+},
+{
+"filename": "projectlab0102.php",
+"header": "Final Project Lab 1.2",
+"title": "Creating a Database Design",
+"description": "Creating a database design for the final project",
+"status": "Completed",
+"due date": "2026-02-01"
+},
+{
+"filename": "projectlab02.php",
+"header": "Final Project Lab 2",
+"title": "Connect your Database to a PHP Program You Create",
+"description": "Connecting a database to a PHP program",
+"status": "Completed",
+"due date": "2026-02-08"
+}, 
+{
+"filename": "projectlab03.php",
+"header": "Final Project Lab 3",
+"title": "Interface to Add Records to your Database",
+"description": "Creating an interface to add records to the database",
+"status": "Completed",
+"due date": "2026-02-15"
+},
+{
+"filename": "projectlab04.php",
+"header": "Final Project Lab 4",
+"title": "Interface to Edit Records in your Database",
+"description": "Creating an interface to edit records in the database",
+"status": "Completed",
+"due date": "2026-02-22"
+},
+{
+"filename": "projectlab05.php",
+"header": "Final Project Lab 5",
+"title": "Navigation and Interface Enhancements",
+"description": "Adding navigation and interface enhancements to the project",
+"status": "In Progress",
+"due date": "2026-03-01"
+},
+{
+"filename": "projectlab06.php",
+"header": "Final Project Lab 6",
+"title": "Interfaces to All Database Tables",
+"description": "Creating interfaces to all database tables in the project",
+"status": "In Progress",
+"due date": "2026-03-08"
+},
+{
+"filename": "projectlab07.php",
+"header": "Final Project Lab 7",
+"title": "Progress Report 1",
+"description": "First progress report for the final project",
+"status": "In Progress",
+"due date": "2026-03-15"
+},
+{
+"filename": "projectlab08.php",
+"header": "Final Project Lab 8",
+"title": "Admin Password Protected Dictory",
+"description": "Creating an admin password protected directory for the project",
+"status": "In Progress",
+"due date": "2026-03-29"
+},
+
+{
+"filename": "projectlab09.php",
+"header": "Final Project Lab 9",   
+"title": "Data Validation on All User Entered Data",
+"description": "Implementing data validation on all user entered data",       
+"status": "In Progress",
+"due date": "2026-04-05"
+},
+{
+"filename": "projectlab10.php",
+"header": "Final Project Lab 10",
+"title": "Admin Interface To Delete Seleccted Records",
+"description": "Creating an admin interface to delete selected records",
+"status": "In Progress",
+"due date": "2026-04-05"
+},
+{
+"filename": "projectlab11.php",
+"header": "Final Project Lab 11",
+"title": "Progress Report 2",
+"description": "Self-Assessment of Final Project",
+"status": "In Progress",
+"due date": "2026-04-12"
+},
+{
+"filename": "final-project",
+"header": "Final Project",
+"title": "Final Project Submission",
+"description": "Submitting the final project",
+"status": "In Progress",
+"due date": "2026-04-26"
+}
+]

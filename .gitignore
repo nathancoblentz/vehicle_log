@@ -1,0 +1,93 @@
+# ---------------------------
+# OS Files
+# ---------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+/includes/config.php
+
+
+includes/config.php
+
+# ---------------------------
+# Exercises / Local folders
+# ---------------------------
+exercises/
+agent/
+ex_starts/
+
+# ---------------------------
+# VS Code
+# ---------------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+# ---------------------------
+# Logs
+# ---------------------------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---------------------------
+# Environment / Secrets
+# ---------------------------
+.env
+.env.local
+.env.*.local
+
+# ---------------------------
+# Dependency folders
+# ---------------------------
+vendor/
+node_modules/
+
+# ---------------------------
+# Build / Cache
+# ---------------------------
+.cache/
+.tmp/
+temp/
+*.cache
+
+# ---------------------------
+# Database Dumps
+# ---------------------------
+*.sql
+*.sqlite
+*.db
+
+# ---------------------------
+# IDE
+# ---------------------------
+.idea/
+
+# ---------------------------
+# PHP / Composer
+# ---------------------------
+composer.lock
+
+# ---------------------------
+# Uploaded Files
+# ---------------------------
+uploads/
+storage/
+public/uploads/
+
+# ---------------------------
+# Testing
+# ---------------------------
+coverage/
+.phpunit.result.cache
+
+# ---------------------------
+# Misc
+# ---------------------------
+*.zip
+*.tar
+*.gz
+*.rar
