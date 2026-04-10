@@ -33,10 +33,20 @@ This project was built from the ground up to demonstrate a full-stack skill set,
 
 ## 📂 Project Structure
 
-*   **/controler/** - Contains the PHP scripts that handle form submissions, database inserts/updates/deletes, and redirection logic.
-*   **/view/** - Contains the HTML markup for the Bootstrap forms and modals.
-*   **/includes/** - Reusable PHP components like headers, navigation bars, breadcrumbs, and table rendering functions.
-*   **/data/** - Contains the SQL scripts required to construct the database schema (`vehicle_log.sql`) and populate it with realistic test data (`populate.sql`).
+```
+vehicle_log/
+├── /controller/        - PHP scripts handling form submissions, database operations, and redirection logic
+├── /models/            - Data models for Vehicles, Fuel, Maintenance, Services, Users, and Vendors
+├── /view/              - HTML markup for Bootstrap forms, modals, and display tables
+├── /includes/          - Reusable PHP components (headers, navigation, auth, functions, validation)
+├── /data/              - SQL scripts for schema (`vehicle_log.sql`) and test data (`populate.sql`)
+├── /css/               - Stylesheet files for the application
+├── /js/                - JavaScript files for dynamic interactions and client-side logic
+├── /img/               - Image assets
+├── /admin/             - Admin-specific pages and functionality
+├── config.php          - Database configuration file
+└── landing_page.php    - Main entry point for the application
+```
 
 ## ⚙️ Setup Instructions
 
