@@ -364,7 +364,7 @@ function validateField(string $field, $value, array $all = []): ?string
 
         case 'maintenance_type_id':
             if ($value === '' || (int) $value <= 0) {
-                return 'Maintenance type is required.';
+                return 'Service is required.';
             }
             return null;
 
@@ -407,7 +407,7 @@ function validateField(string $field, $value, array $all = []): ?string
             return null;
 
 
-        // ── MAINTENANCE TYPE ───────────────────────────────────────────────────
+        // ── SERVICES ───────────────────────────────────────────────────────────
 
         case 'maintenance_code':
             // Optional
@@ -418,10 +418,10 @@ function validateField(string $field, $value, array $all = []): ?string
 
         case 'maintenance_type':
             if ($value === '') {
-                return 'Maintenance type name is required.';
+                return 'Service name is required.';
             }
             if (strlen($value) > 100) {
-                return 'Maintenance type name must be 100 characters or fewer.';
+                return 'Service name must be 100 characters or fewer.';
             }
             return null;
 

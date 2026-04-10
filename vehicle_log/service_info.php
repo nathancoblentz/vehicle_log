@@ -106,7 +106,7 @@ if ($maintenance_id) {
     <?php if (!$maintenance_id): ?>
         <div class="alert alert-info">Please select a service from the dropdown above.</div>
     <?php elseif (!$service_info): ?>
-        <div class="alert alert-danger">Maintenance type not found.</div>
+        <div class="alert alert-danger">Service not found.</div>
     <?php else: ?>
         <!-- Service Details Card -->
         <div class="card mb-4 border-0 shadow-sm">
@@ -208,7 +208,7 @@ if ($maintenance_id) {
             </div>
             <div class="card-body">
                 <?php if (empty($maintenance_logs)): ?>
-                    <div class="alert alert-secondary mb-0">No maintenance records found for this type.</div>
+                    <div class="alert alert-secondary mb-0">No maintenance records found for this service.</div>
                 <?php else: ?>
                     <div class="table-responsive">
                         <table class="table table-striped table-hover table-bordered">

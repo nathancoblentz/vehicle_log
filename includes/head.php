@@ -22,8 +22,8 @@ if ($_SERVER['HTTP_HOST'] === 'localhost') {
 // pulse quartz sandstone simplex sketchy slate solar spacelab superhero united vapor yeti zephyr 
 
 $bootstrap_sheet = 'https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css';
-$local_styles = $baseURL . 'css/styles.css';
-$local_scripts = $baseURL . 'js/scripts.js';
+$local_styles = $baseURL . 'vehicle_log/css/styles.css';
+$local_scripts = $baseURL . 'vehicle_log/js/scripts.js';
 
 $exercisesJson = file_get_contents($baseURL . 'exercises/exercises.json'); // read the JSON file and decode it for PHP
 $exercises = json_decode($exercisesJson, true); // true means we are using an associative array

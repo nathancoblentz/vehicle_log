@@ -58,7 +58,7 @@
         <p class="text-secondary">Please use the dropdown menu above to select a maintenance category and view its consolidated service history and cost analysis.</p>
     </div>
 <?php elseif (!$service_info): ?>
-    <div class="alert alert-danger shadow-sm"><i class="fa-solid fa-triangle-exclamation me-2"></i>Maintenance type not found.</div>
+    <div class="alert alert-danger shadow-sm"><i class="fa-solid fa-triangle-exclamation me-2"></i>Service not found.</div>
 <?php else: ?>
     <!-- Horizontal Tabs -->
     <ul class="nav nav-tabs mb-4 border-primary" id="maintTypeTabs" role="tablist">

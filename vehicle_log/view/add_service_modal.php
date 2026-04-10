@@ -1,4 +1,4 @@
-<?php // ADD MAINTENANCE TYPE FORM 
+<?php // ADD SERVICE FORM 
 ?>
 
 <?php

@@ -138,6 +138,6 @@ function deleteMaintenanceType(PDO $db): void
     $feedback = [
         'type'    => 'success',
         'title'   => 'Deleted',
-        'message' => 'Maintenance type deleted successfully.',
+        'message' => 'Service deleted successfully.',
     ];
 }
