@@ -1,50 +1,72 @@
+
 <?php
-// add_vendor_modal.php — Add Vendor form fields
-// Boilerplate handled by renderModalStart() / renderModalEnd()
-
 renderModalStart('addVendorModal', 'Add Vendor', 'addVendorForm', 'add_vendor');
-?>
+$mode = 'add';
+$prefix = 'add_vendor_';
+include __DIR__ . '/partials/_vendor_form.php';
+renderModalEnd('addVendorForm', 'Add Vendor'); ?>
 
-<!-- Vendor Name -->
-<div class="col-12">
-    <label for="vendor_name" class="form-label">Vendor Name</label>
-    <input type="text" class="form-control" id="vendor_name" name="vendor_name" required>
-</div>
 
-<!-- Address -->
-<div class="col-12">
-    <label for="vendor_address" class="form-label">Address</label>
-    <input type="text" class="form-control" id="vendor_address" name="vendor_address">
-</div>
+<script>
+    (function() {
+        let isConfirmed = false;
+        const form = document.getElementById('addVendorForm');
+        const modal = document.getElementById('addVendorModal');
+        const confirmNotice = document.getElementById('add_vendor_confirm_notice');
+        const errorAlert = document.getElementById('add_vendor_error_alert');
+        const submitBtn = modal.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
 
-<!-- City -->
-<div class="col-md-4">
-    <label for="vendor_city" class="form-label">City</label>
-    <input type="text" class="form-control" id="vendor_city" name="vendor_city">
-</div>
+        form.addEventListener('submit', function(e) {
+            const email = document.getElementById('add_vendor_email').value.trim();
+            const phone = document.getElementById('add_vendor_phone').value.trim();
+            let errors = [];
 
-<!-- State -->
-<div class="col-md-4">
-    <label for="vendor_state" class="form-label">State</label>
-    <input type="text" class="form-control" id="vendor_state" name="vendor_state" maxlength="2">
-</div>
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email !== "" && !emailRegex.test(email)) {
+                errors.push("<strong>Email:</strong> Please enter a valid email address.");
+            }
 
-<!-- Zip -->
-<div class="col-md-4">
-    <label for="vendor_zip" class="form-label">Zip Code</label>
-    <input type="text" class="form-control" id="vendor_zip" name="vendor_zip">
-</div>
+            // Phone validation
+            const phoneRegex = /^\(\d{3}\)-\d{3}-\d{4}$/;
+            if (phone === "") {
+                errors.push("<strong>Phone:</strong> is required.");
+            } else if (!phoneRegex.test(phone)) {
+                errors.push("<strong>Phone:</strong> must be 10 digits in (XXX)-XXX-XXXX format.");
+            }
 
-<!-- Phone -->
-<div class="col-md-6">
-    <label for="vendor_phone" class="form-label">Phone</label>
-    <input type="text" class="form-control" id="vendor_phone" name="vendor_phone">
-</div>
+            if (errors.length > 0) {
+                e.preventDefault();
+                errorAlert.innerHTML = errors.join('<br>');
+                errorAlert.classList.remove('d-none');
+                confirmNotice.classList.add('d-none'); // Hide confirm if errors exist
+                isConfirmed = false;
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.className = 'btn btn-primary';
+                
+                document.querySelector('#addVendorModal .modal-body').scrollTop = 0;
+            } else if (!isConfirmed) {
+                // First valid click -> ask for confirmation
+                e.preventDefault();
+                isConfirmed = true;
+                confirmNotice.classList.remove('d-none');
+                errorAlert.classList.add('d-none');
+                
+                submitBtn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Finalize Save';
+                submitBtn.className = 'btn btn-warning';
+                
+                document.querySelector('#addVendorModal .modal-body').scrollTop = 0;
+            }
+        });
 
-<!-- Email -->
-<div class="col-md-6">
-    <label for="vendor_email" class="form-label">Email</label>
-    <input type="email" class="form-control" id="vendor_email" name="vendor_email">
-</div>
-
-<?php renderModalEnd('addVendorForm', 'Add Vendor'); ?>
+        // Reset state when modal is closed
+        modal.addEventListener('hidden.bs.modal', function() {
+            errorAlert.classList.add('d-none');
+            confirmNotice.classList.add('d-none');
+            isConfirmed = false;
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.className = 'btn btn-primary';
+        });
+    })();
+</script>

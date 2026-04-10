@@ -2,19 +2,12 @@
 // vehicle_info.php
 
 require 'config.php'; //     Database connection
-include_once 'includes/functions.php'; // For renderVehiclesTable, renderFuelTable, renderMaintenanceTable
-
-// Title for the page
 $title = "Vehicle Info";
-
-// Head section
-include_once '../includes/head.php';
-
-// Navigation
-include_once '../includes/nav.php';
-
-// Hero section
-include_once '../includes/hero.php';
+$hideNav = true; 
+$requireAuth = true;
+require_once 'includes/header_bundle.php';
+include_once 'includes/functions.php'; // For renderVehiclesTable, renderFuelTable, renderMaintenanceTable
+addHandlers();
 
 // Fetch all vehicles for the dropdown
 $stmt = $db->query("SELECT vehicle_id, vehicle_year, vehicle_make, vehicle_model FROM vehicles ORDER BY vehicle_year DESC, vehicle_make, vehicle_model");
@@ -57,6 +50,16 @@ if ($vehicle_id) {
 ?>
 
 <div class="container mt-4">
+    <!-- logged in user right align -->
+    <div class="d-flex justify-content-end align-items-center py-3">
+        <span class="text-muted me-2">
+            <i class="fa-solid fa-user-circle me-1"></i>
+            You are logged in as <strong><?= htmlspecialchars($_SESSION['user']['name'] ?? 'System User') ?></strong>.
+        </span>
+        <a class="btn btn-outline-secondary btn-sm" href="<?= $baseURL ?>vehicle_log/logout.php">
+            <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+        </a>
+    </div>
 
     <?php
     if ($vehicle) {
@@ -67,12 +70,7 @@ if ($vehicle_id) {
     }
     ?> <!-- Back Button & Vehicle Selection Dropdown -->
     <div class="row mb-3 align-items-center">
-        <div class="col-md-6">
-            <a href="edit_vehicle.php" class="btn btn-outline-secondary">
-                <i class="fa-solid fa-arrow-left me-1"></i> Back to Vehicle List
-            </a>
-        </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <div class="col-12 text-end mt-3 mt-md-0">
             <form action="vehicle_info.php" method="GET" class="d-inline-block shadow-sm" style="min-width: 250px;">
                 <div class="input-group">
                     <span class="input-group-text bg-primary text-white border-primary"><i
@@ -85,6 +83,25 @@ if ($vehicle_id) {
                             </option>
                         <?php endforeach; ?>
                     </select>
+                    <?php if ($vehicle_id && $vehicle): ?>
+                        <button type="button" class="btn btn-warning border-primary" data-bs-toggle="modal"
+                            data-bs-target="#editVehicleModal" data-vehicle-id="<?= $vehicle['vehicle_id'] ?>"
+                            data-vehicle-type="<?= htmlspecialchars($vehicle['vehicle_type'] ?? '') ?>"
+                            data-vehicle-make="<?= htmlspecialchars($vehicle['vehicle_make'] ?? '') ?>"
+                            data-vehicle-model="<?= htmlspecialchars($vehicle['vehicle_model'] ?? '') ?>"
+                            data-vehicle-year="<?= htmlspecialchars($vehicle['vehicle_year'] ?? '') ?>"
+                            data-vehicle-year-purchased="<?= htmlspecialchars($vehicle['vehicle_year_purchased'] ?? '') ?>"
+                            data-vehicle-color="<?= htmlspecialchars($vehicle['vehicle_color'] ?? '') ?>"
+                            data-vehicle-vin="<?= htmlspecialchars($vehicle['vehicle_VIN'] ?? '') ?>"
+                            data-vehicle-license-tag="<?= htmlspecialchars($vehicle['vehicle_license_tag'] ?? '') ?>"
+                            data-vehicle-license-state="<?= htmlspecialchars($vehicle['vehicle_license_state'] ?? '') ?>"
+                            data-vehicle-purchase-price="<?= htmlspecialchars((string) ($vehicle['vehicle_purchase_price'] ?? '')) ?>"
+                            data-vehicle-purchase-mileage="<?= round((int) ($vehicle['vehicle_purchase_mileage'] ?? 0)) ?>"
+                            data-vehicle-current-mileage="<?= round((int) ($vehicle['vehicle_current_mileage'] ?? 0)) ?>"
+                            data-is-active="<?= $vehicle['is_active'] ?? 1 ?>" title="Edit This Vehicle">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    <?php endif; ?>
                 </div>
             </form>
         </div>
@@ -142,9 +159,9 @@ if ($vehicle_id) {
                         </tr>
                         <tr>
                             <th class="table-dark">Purchase Mileage</th>
-                            <td><?= number_format($vehicle['vehicle_purchase_mileage'] ?? 0) ?></td>
+                            <td><?= number_format((int)($vehicle['vehicle_purchase_mileage'] ?? 0)) ?></td>
                             <th class="table-dark">Current Mileage</th>
-                            <td><?= number_format($vehicle['vehicle_current_mileage'] ?? 0) ?></td>
+                            <td><?= number_format((int)($vehicle['vehicle_current_mileage'] ?? 0)) ?></td>
                         </tr>
                         <tr>
                             <th class="table-dark">Status</th>
@@ -252,4 +269,7 @@ if ($vehicle_id) {
 
 </div>
 
-<?php include_once('../includes/footer.php'); ?>
+<?php
+addForms();
+addFeedback();
+include_once('../includes/footer.php'); ?>

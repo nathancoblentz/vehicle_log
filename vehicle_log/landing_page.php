@@ -5,8 +5,7 @@ include_once 'includes/functions.php';
 
 // Set page title and include header
 $title = 'Fleet Management Dashboard';
-include_once '../includes/head.php';
-include_once '../includes/nav.php';
+require_once 'includes/header_bundle.php';
 ?>
 
 <!-- Minimal Custom CSS -->

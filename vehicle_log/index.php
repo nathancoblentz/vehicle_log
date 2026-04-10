@@ -1,19 +1,8 @@
 <?php
 
-require 'config.php'; // Database connection
-include_once 'includes/functions.php'; // For renderVehiclesTable, renderFuelTable, renderMaintenanceTable
-
-$feedback = null; // To store success/error messages for display in the UI
-
-// PROCESS FORM SUBMISSIONS
-
-// ADD
-addHandlers();
-
 $title = 'Vehicle Log | Fleet Management Dashboard';
-include_once '../includes/head.php';
-include_once '../includes/nav.php';
-include_once '../includes/hero.php';
+$showHero = true;
+require_once 'includes/header_bundle.php';
 ?>
 
 <div class="container mt-4">
@@ -48,7 +37,7 @@ include_once '../includes/hero.php';
                         <li class="list-group-item"><a href="edit_vehicle.php">Edit Vehicle</a></li>
                         <li class="list-group-item"><a href="edit_maintenance.php">Edit Maintenance</a></li>
                         <li class="list-group-item"><a href="edit_Fuel.php">Edit Fuel Log</a></li>
-                        <li class="list-group-item"><a href="edit_maintenance_type.php">Edit Maintenance Type</a></li>
+                        <li class="list-group-item"><a href="edit_service.php">Edit Service</a></li>
                     </ul>
                 </li>
                 <li class="list-group-item">
@@ -56,10 +45,34 @@ include_once '../includes/hero.php';
                     <a href="projectlab05.php"><p>Navigation and Inteface Elements</p></a>
                     <li class="list-group-item"><a href="landing_page.php"></a></li>
                     <li class="list-group-item"><a href="table.php">Table View</a></li>
-                    <li class="list-group-item"><a href="vehicle_info.php">Vehicle Info Page</a></li>
-                    <li class="list-group-item"><a href="vendor_info.php">Vendor Info Page</a></li>
-                    <li class="list-group-item"><a href="maintenance_type_info.php">Maintenance Type Info Page</a></li>
+                    <li class="list-group-item"><a href="info.php">Consolidated Info Center</a></li>
                 </li>
+                <li class="list-group-item">
+                    <h4>Final Project Lab 6</h4>
+                    <a href="projectlab06.php">Interfaces to All Database Tables</a>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="table.php">Table View</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="list-group-item">
+                    <h4>Final Project Lab 7</h4>
+                    <p>Progress Report Sumbitted</p>
+                </li>
+                <li class="list-group-item">
+                    <h4>Final Project Lab 8</h4>
+                    <a href="projectlab08.php"><p>Admin Password Protected Directory</p></a>
+                </li>
+                <li class="list-group-item">
+                    <h4>Final Project Lab 9</h4>
+                    <a href="projectlab09.php"><p>Form Validation and Modal Recovery System</p></a>
+                </li>
+                <li class="list-group-item">
+                    <h4>Final Project Lab 10</h4>
+                    <a href="projectlab10.php"><p>User Roles, Privileges, and Data Integrity</p></a>
+                </li>
+
             </ul>
                 
 

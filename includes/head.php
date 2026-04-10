@@ -46,6 +46,11 @@ $exercises = json_decode($exercisesJson, true); // true means we are using an as
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <!-- Google Fonts: Inter -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
         <!-- Bootstrap CSS -->
         <link href="<?= $bootstrap_sheet ?>" rel="stylesheet">
         <!-- Font Awesome -->
@@ -54,6 +59,13 @@ $exercises = json_decode($exercisesJson, true); // true means we are using an as
         <link href="<?= $local_styles ?>" rel="stylesheet">
 
         <title><?php echo $title ?></title>
+
+        <style>
+            /* Apply Inter font globally overriding Bootswatch defaults smoothly */
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            }
+        </style>
 
         <!-- bootstrap JS in case we use any interactive elements -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"

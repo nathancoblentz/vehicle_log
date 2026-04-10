@@ -1,137 +1,240 @@
-<!--
+<?php
+/*
     Jonathan Coblentz
     CPT283: PHP Programming
     Final Project: Vehicle Maintenance Log
-    
-    This project is a web-based application for logging and tracking vehicle maintenance and fuel records. It includes user authentication, CRUD operations for vehicles, maintenance types, maintenance records, and fuel records. The application is built using PHP, MySQL, and Bootstrap for styling.
-    
+
+    This project is a web-based application for logging and tracking vehicle maintenance
+    and fuel records. It includes user authentication, CRUD operations for vehicles,
+    services, maintenance records, and fuel records.
+
     Lab 05 focuses on navigation.
-    
-    -->
-<?php
+*/
 
-require 'config.php'; // Database connection
-include_once 'includes/functions.php'; // For renderVehiclesTable, renderFuelTable, renderMaintenanceTable
+require 'config.php';
+$title = 'Table View';
+$hideNav = true; 
+$requireAuth = true;
+require_once 'includes/header_bundle.php';
+include_once 'includes/functions.php';
 
-$feedback = null; // To store success/error messages for display in the UI
 
-// PROCESS FORM SUBMISSIONS
 
-// Form handlers, and modals are included in this file so they are available on the same page as the dashboard for better user experience and feedback display.  They are defined in functions.php and the actual processing logic is in the controler/ directory. This keeps the code organized and modular while still allowing for dynamic feedback on the same page.
+/* ------------------------------
+   PAGE HEADER
+------------------------------ */
 
-addHandlers();
-
-$title = 'Lab 05 | Navigation';
+$title = 'Table View';
 include_once '../includes/head.php';
 
+
+
+/* ------------------------------
+   NAVIGATION CONFIGURATION
+------------------------------ */
+
+$tabs = [
+    "vehicles" => [
+        "label" => "Vehicles",
+        "icon" => "fa-car-side",
+        "file" => "view/vehicles_table.php"
+    ],
+
+    "maintenance" => [
+        "label" => "Maintenance Logs",
+        "icon" => "fa-wrench",
+        "file" => "view/maintenance_table.php"
+    ],
+
+    "vendors" => [
+        "label" => "Vendors",
+        "icon" => "fa-store",
+        "file" => "view/vendors_table.php"
+    ],
+
+    "fuel" => [
+        "label" => "Fuel",
+        "icon" => "fa-gas-pump",
+        "file" => "view/fuel_table.php"
+    ],
+
+    "services" => [
+        "label" => "Services",
+        "icon" => "fa-screwdriver-wrench",
+        "file" => "view/service_table.php"
+    ],
+
+    "users" => [
+        "label" => "Users",
+        "icon" => "fa-users",
+        "file" => "view/user_table.php"
+    ]
+];
+
+// Hide delete button from ALL users in the standard table view
+$allow_delete = false;
+
+// Remove users tab for non-admins
+if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+    unset($tabs['users']);
+}
+
+$active_tab_id = $_GET['tab'] ?? array_key_first($tabs);
 
 ?>
 
 
-
-<div class="container">
+<div class="container mt-4">
+<?php
+$headerTitle   = 'List View';
+$headerIcon    = 'fa-list';
+$headerActive  = 'list';
+$headerListUrl = 'table.php';
+$headerInfoUrl = 'info.php';
+$headerBadge   = '';
+include __DIR__ . '/view/partials/_page_header.php';
+?>
 
     <div class="d-flex align-items-start">
-        <div class="nav flex-column nav-pills me-2" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            <!--vehicles tab-->
-            <button class="nav-link active" id="v-pills-vehicles-tab" data-bs-toggle="pill"
-                data-bs-target="#v-pills-vehicles" type="button" role="tab" aria-controls="v-pills-vehicles"
-                aria-selected="true">
-                <span class="fas fa-car-side fa-2xl"></span>
-            </button>
 
-            <!-- maintenance tab-->
-            <button class="nav-link" id="v-pills-maintenance-tab" data-bs-toggle="pill"
-                data-bs-target="#v-pills-maintenance" type="button" role="tab" aria-controls="v-pills-maintenance"
-                aria-selected="false">
-                <span class="fas fa-wrench fa-2xl"></span>
-            </button>
+        <!-- =========================
+     VERTICAL NAVIGATION
+========================= -->
 
-            <!-- vendors tab -->
-            <button class="nav-link" id="v-pills-vendors-tab" data-bs-toggle="pill" data-bs-target="#v-pills-vendors"
-                type="button" role="tab" aria-controls="v-pills-vendors" aria-selected="false">
-                <span class="fas fa-store fa-2xl"></span>
-            </button>
+        <?php include __DIR__ . '/view/partials/_vertical_tabs.php'; ?>
 
-            <!-- fuel tab -->
-            <button class="nav-link" id="v-pills-fuel-tab" data-bs-toggle="pill" data-bs-target="#v-pills-fuel"
-                type="button" role="tab" aria-controls="v-pills-fuel" aria-selected="false">
-                <span class="fas fa-gas-pump fa-2xl"></span>
-            </button>
 
-            <!-- maintenance types tab -->
-            <button class="nav-link" id="v-pills-maintenance-types-tab" data-bs-toggle="pill"
-                data-bs-target="#v-pills-maintenance-types" type="button" role="tab"
-                aria-controls="v-pills-maintenance-types" aria-selected="false">
-                <span class="fas fa-gears fa-2xl"></span>
-            </button>
-        </div>
 
+        <!-- =========================
+     TAB CONTENT
+========================= -->
 
         <div class="tab-content w-100" id="v-pills-tabContent">
-            <!-- vehicles tab -->
-            <div class="tab-pane fade show active" id="v-pills-vehicles" role="tabpanel"
-                aria-labelledby="v-pills-vehicles-tab" tabindex="0">
-                <?php include('includes/vehicles.php') ?>
-            </div>
-            <!-- maintenance tab -->
-            <div class="tab-pane fade" id="v-pills-maintenance" role="tabpanel"
-                aria-labelledby="v-pills-maintenance-tab" tabindex="0">
-                <?php include('includes/maintenance.php') ?>
-            </div>
-            <!-- vendors tab -->
-            <div class="tab-pane fade" id="v-pills-vendors" role="tabpanel" aria-labelledby="v-pills-vendors-tab"
-                tabindex="0">
-                <?php include('includes/vendors.php') ?>
-            </div>
-            <!-- fuel tab -->
-            <div class="tab-pane fade" id="v-pills-fuel" role="tabpanel" aria-labelledby="v-pills-fuel-tab"
-                tabindex="0">
-                <?php include('includes/fuel.php') ?>
-            </div>
-            <!-- maintenance types tab -->
-            <div class="tab-pane fade" id="v-pills-maintenance-types" role="tabpanel"
-                aria-labelledby="v-pills-maintenance-types-tab" tabindex="0">
-                <?php include('includes/maintenance_type.php') ?>
-            </div>
+
+            <?php
+            foreach ($tabs as $id => $tab) {
+
+                $active = ($id === $active_tab_id) ? "show active" : "";
+
+                echo "
+    <div
+        class='tab-pane fade $active'
+        id='v-pills-$id'
+        role='tabpanel'
+        aria-labelledby='v-pills-$id-tab'
+        tabindex='0'
+    >";
+
+                include($tab['file']);
+
+                echo "</div>";
+
+            }
+            ?>
+
         </div>
+
     </div>
 </div>
 
 
 
+<!-- =========================
+     FORM MODALS
+========================= -->
 
-
-
-<!-- FORM MODALS -->
 <?php addForms(); ?>
+<?php addFeedback(); ?>
+
+
+
+<!-- =========================
+     TAB HASH SCRIPT
+========================= -->
 
 <script>
+
     document.addEventListener("DOMContentLoaded", function () {
-        // 1. On load, read hash from URL and activate corresponding tab
+
+        /* -------------------------
+           Load tab from URL hash
+        ------------------------- */
+
         let hash = window.location.hash;
+
         if (hash) {
-            // Find the tab button that targets this hash (e.g., data-bs-target="#v-pills-fuel")
-            let targetButton = document.querySelector('button[data-bs-target="' + hash + '"]');
+
+            let targetButton = document.querySelector(
+                'button[data-bs-target="' + hash + '"]'
+            );
+
             if (targetButton) {
+
                 let tab = new bootstrap.Tab(targetButton);
                 tab.show();
+
             }
+
         }
 
-        // 2. On clicking any tab, update the URL hash
-        let tabButtons = document.querySelectorAll('button[data-bs-toggle="pill"]');
+
+
+        /* -------------------------
+           Update URL when tab changes
+        ------------------------- */
+
+        let tabButtons = document.querySelectorAll(
+            'button[data-bs-toggle="pill"]'
+        );
+
         tabButtons.forEach(function (button) {
+
             button.addEventListener('shown.bs.tab', function (e) {
+
                 let activeTarget = e.target.getAttribute('data-bs-target');
+
                 if (activeTarget) {
-                    // Use history API to change hash without jumping the page
+
                     history.replaceState(null, null, activeTarget);
+
                 }
+
             });
+
         });
+
     });
+
+
+    /* -------------------------
+       Toggle switch to hide or show active records
+    ------------------------- */
+
+    window.toggle_active = function (checkbox, countId) {
+
+        let inactive = document.querySelectorAll("tr.text-decoration-line-through");
+
+        inactive.forEach(row => {
+            if (checkbox.checked) {
+                row.classList.remove("d-none");
+            } else {
+                row.classList.add("d-none");
+            }
+        });
+
+        let countEl = document.getElementById(countId);
+
+        if (countEl) {
+            let count = checkbox.checked ? countEl.dataset.totalCount : countEl.dataset.activeCount;
+            let label = countEl.dataset.label;
+            countEl.textContent = count + ' result(s) for "' + label + '"';
+        }
+    };
+
+
+
 </script>
+
 
 
 <?php include_once('../includes/footer.php'); ?>

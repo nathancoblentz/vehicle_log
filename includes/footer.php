@@ -16,8 +16,18 @@ if (basename(__DIR__) === 'vehicle_log') {
 <!-- Global modal backdrop cleanup -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Prevent sticky form inputs on page reload
+        document.querySelectorAll('.modal form').forEach(function (f) {
+            f.reset();
+        });
+
         document.querySelectorAll('.modal').forEach(function (modal) {
             modal.addEventListener('hidden.bs.modal', function () {
+                // Clear inputs when modal is closed
+                modal.querySelectorAll('form').forEach(function (f) {
+                    f.reset();
+                });
+
                 document.querySelectorAll('.modal-backdrop').forEach(function (el) { el.remove(); });
                 document.body.classList.remove('modal-open');
                 document.body.style.overflow = '';

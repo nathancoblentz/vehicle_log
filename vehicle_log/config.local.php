@@ -1,23 +1,29 @@
 <?php
-$host = 'localhost';
-$dbname = 'cpt283coblentz_vehicle_log';
-$user ='root'; // ← Change this to your REAL DB username
-$username = 'cpt283coblentz';  // ← Change this to your REAL DB username
-$password = 'Pinkyp!321'; // ← Change this to your REAL DB password
-$charset = 'utf8mb4';
+/**
+ * config.local.php - Local Database Configuration
+ * 
+ * This file contains the database connection settings and system-wide
+ * constants for the development environment.
+ * 
+ * NOTE: The closing PHP tag '?>' is intentionally omitted to prevent
+ * accidental trailing whitespace from causing "headers already sent" errors.
+ */
 
+$host    = 'localhost';
+$dbname  = 'cpt283coblentz_vehicle_log';
+$user    = 'root';            // ← Development default
+$username = 'cpt283coblentz';  // ← System integration username
+$password = 'Pinkyp!321';      // ← System integration password
+$charset  = 'utf8mb4';
+
+// Root of the project (vehicle_log folder)
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', __DIR__);
+}
 
 try {
-    $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $db = new PDO("mysql:host=$host;dbname=$dbname;charset=$charset", $username, $password);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    die("DB Error: " . $e->getMessage());
+    die("Database Connection Error: " . $e->getMessage());
 }
-?>
-
-<!-- AIzaSyCzbAywlFJcaU_qcZQE7bppI9YYuQcBeAk - google api key for antigravity IDE -->
-
-<!-- OpenAI API key for Antigravity IDE -->
-<!-- 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 -->
-
-

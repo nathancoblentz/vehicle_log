@@ -1,6 +1,49 @@
 <?php
 
 /**
+ * =============================================================================
+ * functions.php — Core Utility & View Helpers Library
+ * =============================================================================
+ *
+ * PURPOSE:
+ *   This file contains all the reusable rendering functions and system-wide
+ *   utilities for the application. It acts as the "glue" between the database
+ *   data, the controllers, and the HTML views.
+ *
+ * WHAT LIVES HERE:
+ *
+ *   1. View Helpers (Rendering UI)
+ *      Instead of copying and pasting the same HTML for tables and modals,
+ *      these functions generate the HTML dynamically.
+ *      - `renderTable()`: Takes a 2D array from the database and spits out a
+ *        Bootstrap-styled table completely automatically.
+ *      - `renderModalStart() / End()`: Generates the boilerplate HTML needed
+ *        for a popup form modal.
+ *
+ *   2. Controller Router (`addHandlers()`)
+ *      This is the traffic cop for all form submissions (POST requests).
+ *      Instead of letting every page process its own forms, the `addHandlers()`
+ *      function sits near the top of the app and listens for ANY form submission
+ *      (determined by hidden input fields like `name="add_vehicle"`).
+ *
+ * HOW ROUTING WORKS:
+ *   Every form in the application includes a hidden input like this:
+ *     <input type="hidden" name="add_vehicle" value="1">
+ *
+ *   When the user submits the form, `addHandlers()` detects that `add_vehicle`
+ *   was sent in the `$_POST` array, and it immediately routes the request to
+ *   the appropriate controller (`vehicle_controller.php`), which then parses,
+ *   validates, and saves it. 
+ *
+ * DRY PRINCIPLE:
+ *   By keeping these functions here, we ensure that if we want to change how
+ *   our tables look (e.g., adding a CSS class), we only have to change it in
+ *   ONE place (`renderTable`), and the entire site updates instantly.
+ *
+ * =============================================================================
+ */
+
+/**
  * Render a generic Bootstrap table from an array of associative arrays.
  *
  * @param array $rows
@@ -35,7 +78,16 @@ function renderTable(array $rows, ?array $columns = null, string $tableClass = '
         echo '<tr>';
         foreach ($columns as $key => $label) {
             $value = $row[$key] ?? '';
-            echo '<td>' . htmlspecialchars($value) . '</td>';
+            
+            // Auto-format active states as glowing badges
+            if ($key === 'is_active') {
+                $isActive = ($value == 1 || strtolower((string)$value) === 'true' || strtolower((string)$value) === 'active');
+                $glowClass = $isActive ? 'glow-success' : 'glow-danger';
+                $text = $isActive ? 'Active' : 'Inactive';
+                echo '<td class="text-center align-middle"><span class="badge ' . $glowClass . '">' . $text . '</span></td>';
+            } else {
+                echo '<td class="align-middle">' . htmlspecialchars((string)$value) . '</td>';
+            }
         }
         echo '</tr>';
     }
@@ -48,27 +100,12 @@ function renderTable(array $rows, ?array $columns = null, string $tableClass = '
 
 /**
  * Vehicles
+ * @param PDO $db Database connection
  */
 function renderVehiclesTable(PDO $db)
 {
-
-    $query = "
-        SELECT 
-            vehicle_id,
-            CONCAT(vehicle_year, ' ', vehicle_make, ' ', vehicle_model, ' (', LOWER(vehicle_color), ' ', LOWER(vehicle_type), ')') AS vehicle_full,
-            vehicle_VIN,
-            vehicle_license_tag,
-            vehicle_license_state,
-            vehicle_current_mileage,
-            is_active
-        FROM vehicles
-        ORDER BY is_active DESC, vehicle_make ASC
-    ";
-
-    $stmt = $db->prepare($query);
-    $stmt->execute();
-    $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->closeCursor();
+    require_once __DIR__ . '/../models/VehicleModel.php';
+    $vehicles = VehicleModel::getFilteredVehicles($db, "");
 
     $columns = [
         'vehicle_full' => 'Vehicle',
@@ -85,18 +122,12 @@ function renderVehiclesTable(PDO $db)
 
 /**
  * Users
+ * @param PDO $db Database connection
  */
 function renderUsersTable(PDO $db)
 {
-
-    $stmt = $db->query("
-        SELECT user_id, first_name, last_name, email, user_role,
-               is_active, date_created, date_lastlogin, date_modified
-        FROM users
-    ");
-
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->closeCursor();
+    require_once __DIR__ . '/../models/UserModel.php';
+    $users = UserModel::getAllUsers($db);
 
     $columns = [
         'user_id' => 'ID',
@@ -116,26 +147,19 @@ function renderUsersTable(PDO $db)
 
 /**
  * Fuel
+ * @param PDO $db Database connection
  */
 function renderFuelTable(PDO $db)
 {
-
-    $stmt = $db->query("
-        SELECT fuel.fuel_id, fuel.vehicle_id,
-               CONCAT(vehicle_year, ' ', vehicle_make, ' ', vehicle_model, ' (', LOWER(vehicle_color), ' ', LOWER(vehicle_type), ')') AS vehicle_full,
-               fuel_source, fuel_gallons,
-               CONCAT('$', FORMAT(fuel_cost_per_gallon, 3)) AS fuel_cost_per_gallon,
-               CONCAT('$', FORMAT(fuel_gallons * fuel_cost_per_gallon, 2)) AS fuel_cost, 
-               fuel_mileage,
-               DATE_FORMAT(fuel.fuel_date, '%b %e, %Y') AS fuel_date_formatted,
-               fuel_payment_method
-        FROM fuel
-        JOIN vehicles ON vehicles.vehicle_id = fuel.vehicle_id
-        ORDER BY fuel.fuel_date DESC
-    ");
-
-    $fuelRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->closeCursor();
+    require_once __DIR__ . '/../models/FuelModel.php';
+    $fuelRowsRaw = FuelModel::getFilteredFuel($db, ['search_string' => '', 'start_date' => '', 'end_date' => '', 'min_cost' => '', 'max_cost' => '']);
+    
+    $fuelRows = [];
+    foreach ($fuelRowsRaw as $row) {
+        $row['fuel_cost_per_gallon'] = '$' . number_format($row['fuel_cost_per_gallon'], 3);
+        $row['fuel_cost'] = '$' . number_format($row['fuel_cost'], 2);
+        $fuelRows[] = $row;
+    }
 
     $columns = [
         'vehicle_full' => 'Vehicle',
@@ -151,32 +175,20 @@ function renderFuelTable(PDO $db)
     renderTable($fuelRows, $columns);
 }
 
-
 /**
  * Maintenance
+ * @param PDO $db Database connection
  */
 function renderMaintenanceTable(PDO $db)
 {
-
-    $stmt = $db->query("
-        SELECT m.maintenance_id, m.vehicle_id, m.maintenance_type_id,
-               CONCAT(vehicle_year, ' ', vehicle_make, ' ', vehicle_model, ' (', LOWER(vehicle_color), ' ', LOWER(vehicle_type), ')') AS vehicle_full,
-               mt.maintenance_type AS type_name,
-               v.vendor_name,
-               m.maintenance_description,
-               m.maintenance_cost,
-               m.maintenance_mileage,
-               DATE_FORMAT(m.maintenance_date, '%b %e, %Y') AS maintenance_date_formatted,
-               m.maintenance_status
-        FROM maintenance m
-        JOIN vehicles ON vehicles.vehicle_id = m.vehicle_id
-        LEFT JOIN maintenance_type mt ON mt.maintenance_id = m.maintenance_type_id
-        LEFT JOIN vendors v ON v.vendor_id = m.vendor_id
-        ORDER BY m.maintenance_date DESC
-    ");
-
-    $maintenance = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->closeCursor();
+    require_once __DIR__ . '/../models/MaintenanceModel.php';
+    $maintRaw = MaintenanceModel::getFilteredMaintenance($db, ['search_string' => '', 'start_date' => '', 'end_date' => '', 'min_cost' => '', 'max_cost' => '']);
+    
+    $maintenance = [];
+    foreach ($maintRaw as $row) {
+        $row['maintenance_cost'] = '$' . number_format($row['maintenance_cost'], 2);
+        $maintenance[] = $row;
+    }
 
     $columns = [
         'vehicle_full' => 'Vehicle',
@@ -192,27 +204,20 @@ function renderMaintenanceTable(PDO $db)
     renderTable($maintenance, $columns);
 }
 
-
 /**
- * Maintenance Types
+ * Services
+ * @param PDO $db Database connection
  */
 function renderMaintenanceTypeTable(PDO $db)
 {
+    require_once __DIR__ . '/../models/ServiceModel.php';
+    $typesRaw = ServiceModel::getFilteredTypes($db, "");
 
-    $stmt = $db->query("
-        SELECT maintenance_id,
-               maintenance_code,
-               maintenance_type,
-               maintenance_description,
-               recommended_interval_miles,
-               recommended_interval_days,
-               CONCAT('$', FORMAT(recommended_cost, 2)) AS recommended_cost
-        FROM maintenance_type
-        ORDER BY maintenance_type ASC
-    ");
-
-    $types = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->closeCursor();
+    $types = [];
+    foreach ($typesRaw as $row) {
+        $row['recommended_cost'] = '$' . number_format((float) $row['recommended_cost'], 2);
+        $types[] = $row;
+    }
 
     $columns = [
         'maintenance_code' => 'Code',
@@ -226,6 +231,27 @@ function renderMaintenanceTypeTable(PDO $db)
     renderTable($types, $columns);
 }
 
+/**
+ * Vendors
+ * @param PDO $db Database connection
+ */
+function renderVendorsTable(PDO $db)
+{
+    require_once __DIR__ . '/../models/VendorModel.php';
+    $vendors = VendorModel::getFilteredVendors($db, "");
+
+    $columns = [
+        'vendor_name' => 'Name',
+        'vendor_city' => 'City',
+        'vendor_state' => 'State',
+        'vendor_phone' => 'Phone',
+        'vendor_email' => 'Email'
+    ];
+
+    renderTable($vendors, $columns);
+}
+
+
 
 // ── MODAL HELPERS ──────────────────────────────────────────────
 
@@ -236,14 +262,15 @@ function renderMaintenanceTypeTable(PDO $db)
  * @param string $title       Modal header title
  * @param string $formId      Form element ID (e.g. 'addVehicleForm')
  * @param string $hiddenName  Hidden input name for handler routing (e.g. 'add_vehicle')
+ * @param string $headerClass Optional custom CSS class for the modal header (e.g. 'bg-danger text-white')
  */
-function renderModalStart(string $id, string $title, string $formId, string $hiddenName): void
+function renderModalStart(string $id, string $title, string $formId, string $hiddenName, string $headerClass = 'bg-primary'): void
 {
     ?>
     <div class="modal fade" id="<?= $id ?>" tabindex="-1" aria-labelledby="<?= $id ?>Label" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header <?= htmlspecialchars($headerClass) ?>">
                     <h5 class="modal-title" id="<?= $id ?>Label"><?= htmlspecialchars($title) ?></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -290,6 +317,31 @@ function renderFeedbackModal(): void
     $isSuccess = ($feedback['type'] === 'success');
     $color = $isSuccess ? 'success' : 'danger';
     $title = $feedback['title'] ?? ($isSuccess ? 'Success' : 'Error');
+
+    // Determine the likely form ID from the previous POST to allow "Continue Editing"
+    $lastFormId = null;
+    if (!$isSuccess) {
+        $idMap = [
+            'add_vehicle'           => 'addVehicleModal',
+            'update_vehicle'        => 'editVehicleModal',
+            'add_fuel'              => 'addFuelModal',
+            'update_fuel'           => 'editFuelModal',
+            'add_vendor'            => 'addVendorModal',
+            'update_vendor'         => 'editVendorModal',
+            'add_maintenance'       => 'addMaintenanceModal',
+            'update_maintenance'    => 'editMaintenanceModal',
+            'add_service'  => 'addMaintenanceTypeModal',
+            'update_service' => 'editMaintenanceTypeModal',
+            'add_user'              => 'addUserModal',
+            'update_user'           => 'editUserModal',
+        ];
+        foreach ($idMap as $postKey => $modalId) {
+            if (isset($_POST[$postKey])) {
+                $lastFormId = $modalId;
+                break;
+            }
+        }
+    }
     ?>
     <div class="modal fade" id="feedbackModal">
         <div class="modal-dialog">
@@ -301,38 +353,124 @@ function renderFeedbackModal(): void
                     <?= htmlspecialchars($feedback['message']) ?>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-<?= $color ?>" data-bs-dismiss="modal">OK</button>
+                    <?php if (!$isSuccess && $lastFormId): ?>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-danger" onclick="reOpenForm('<?= $lastFormId ?>')">
+                            <i class="fa-solid fa-pen-to-square me-1"></i> Continue Editing
+                        </button>
+                    <?php else: ?>
+                        <button class="btn btn-<?= $color ?>" data-bs-dismiss="modal">OK</button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            new bootstrap.Modal(document.getElementById('feedbackModal')).show();
+            const isSuccess = <?= json_encode($isSuccess) ?>;
+            const feedbackModalEl = document.getElementById('feedbackModal');
+            const feedbackModal = new bootstrap.Modal(feedbackModalEl);
+            feedbackModal.show();
+
+            // Global function to re-open a form modal after dismissing the feedback modal
+            window.reOpenForm = function (modalId) {
+                window.isErrorRecovery = true;
+                feedbackModal.hide();
+                // Delay slightly to allow the feedback modal to finish hiding
+                setTimeout(() => {
+                    const targetModalEl = document.getElementById(modalId);
+                    if (targetModalEl) {
+                        const targetModal = new bootstrap.Modal(targetModalEl);
+                        targetModal.show();
+                    }
+                }, 400);
+            };
+
+            // Handle dismissal logic (Only for Success - auto-refresh list)
+            feedbackModalEl.addEventListener('hidden.bs.modal', function () {
+                if (isSuccess) {
+                    // Manually clean up backdrop to prevent "darkened screen" during redirect
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+
+                    // Redirect to show all records, preserving the current tab hash
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('show_all', '1');
+                    const hash = window.location.hash;
+                    window.location.href = url.toString() + hash;
+                }
+            });
+
+            // If this is an error, set a global flag to prevent Edit modals from overwriting POST data
+            if (!isSuccess) {
+                window.isErrorRecovery = true;
+            }
+
+            // Auto-dismiss the feedback modal after 3 seconds for success, longer for errors
+            setTimeout(function () {
+                feedbackModal.hide();
+            }, isSuccess ? 3000 : 5000);
         });
     </script>
     <?php
 }
 
-// ── FORM / FEEDBACK INCLUDES ───────────────────────────────────
-
-// ADD FORMS
-function addForms()
+/**
+ * Returns a value from $_POST if a failed submission occurred, otherwise returns the default.
+ * Helpful for "Sticky Forms" where user input must be preserved after an error.
+ * 
+ * @param string|array $actionKeys One or more keys to check in $_POST (e.g. 'add_fuel', 'update_fuel')
+ * @param string $fieldName  The field name to retrieve
+ * @param string $default    Fallback value
+ */
+function getStickyVal($actionKeys, string $fieldName, string $default = ''): string
 {
-    include_once 'view/add_vehicle_modal.php';
-    include_once 'view/add_fuel_modal.php';
-    include_once 'view/add_maintenance_type_modal.php';
-    include_once 'view/add_maintenance_modal.php';
-    include_once 'view/add_vendor_modal.php';
-
-    // EDIT FORMS
-    include_once 'view/edit_vehicle_modal.php';
-    include_once 'view/edit_maintenance_type_modal.php';
-    include_once 'view/edit_maintenance_modal.php';
-    include_once 'view/edit_fuel_modal.php';
-    include_once 'view/edit_vendor_modal.php';
+    $keys = is_array($actionKeys) ? $actionKeys : [$actionKeys];
+    foreach ($keys as $key) {
+        if (isset($_POST[$key]) && isset($_POST[$fieldName])) {
+            return (string) $_POST[$fieldName];
+        }
+    }
+    return $default;
 }
 
+// ── FORM / FEEDBACK INCLUDES ───────────────────────────────────
+
+/**
+ * Includes all modal HTML files for rendering the Add, Edit, and Delete forms.
+ */
+function addForms()
+{
+    global $db;
+    include_once __DIR__ . '/../view/add_vehicle_modal.php';
+    include_once __DIR__ . '/../view/add_fuel_modal.php';
+    include_once __DIR__ . '/../view/add_service_modal.php';
+    include_once __DIR__ . '/../view/add_maintenance_modal.php';
+    include_once __DIR__ . '/../view/add_vendor_modal.php';
+    include_once __DIR__ . '/../view/add_user_modal.php';
+
+    // EDIT FORMS
+    include_once __DIR__ . '/../view/edit_vehicle_modal.php';
+    include_once __DIR__ . '/../view/edit_service_modal.php';
+    include_once __DIR__ . '/../view/edit_maintenance_modal.php';
+    include_once __DIR__ . '/../view/edit_fuel_modal.php';
+    include_once __DIR__ . '/../view/edit_vendor_modal.php';
+    include_once __DIR__ . '/../view/edit_user_modal.php';
+
+    // DELETE FORMS
+    include_once __DIR__ . '/../view/delete_vehicle_modal.php';
+    include_once __DIR__ . '/../view/delete_service_modal.php';
+    include_once __DIR__ . '/../view/delete_maintenance_modal.php';
+    include_once __DIR__ . '/../view/delete_vendor_modal.php';
+    include_once __DIR__ . '/../view/delete_fuel_modal.php';
+    include_once __DIR__ . '/../view/delete_user_modal.php';
+}
+
+/**
+ * Triggers the feedback modal if $feedback is set in the global scope.
+ */
 function addFeedback()
 {
     renderFeedbackModal();
@@ -344,68 +482,84 @@ function addHandlers()
 {
     global $feedback;
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_vehicle'])) {
-        require 'controler/add_vehicle.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_maintenance_type'])) {
-        require 'controler/add_maintenance_type.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_maintenance'])) {
-        require 'controler/add_maintenance.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_fuel'])) {
-        require 'controler/add_fuel.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_vendor'])) {
-        require 'controler/add_vendor.php';
+    // Check if the request method is POST
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST')
+        return;
 
-        // DELETE
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deactivate_vehicle'])) {
-        require 'controler/deactivate_vehicle.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_vehicle'])) {
-        require 'controler/delete_vehicle.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_maintenance_type'])) {
-        require 'controler/delete_maintenance_type.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_maintenance'])) {
-        require 'controler/delete_maintenance.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_fuel'])) {
-        require 'controler/delete_fuel.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_vendor'])) {
-        require 'controler/delete_vendor.php';
+    // ── Vehicles ───────────────────────────────────────────────────────────────
 
-        // UPDATE
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_vehicle'])) {
-        require 'controler/update_vehicle.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_maintenance_type'])) {
-        require 'controler/update_maintenance_type.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_maintenance'])) {
-        require 'controler/update_maintenance.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_fuel'])) {
-        require 'controler/update_fuel.php';
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_vendor'])) {
-        require 'controler/update_vendor.php';
+    if (
+        isset($_POST['add_vehicle']) || isset($_POST['update_vehicle'])
+        || isset($_POST['deactivate_vehicle']) || isset($_POST['delete_vehicle'])
+    ) {
+
+        // Include the vehicle controller
+        require_once __DIR__ . '/../controller/vehicle_controller.php';
+
+        // ── Fuel ───────────────────────────────────────────────────────────────────
+
+    } elseif (
+        isset($_POST['add_fuel']) || isset($_POST['update_fuel'])
+        || isset($_POST['deactivate_fuel']) || isset($_POST['delete_fuel'])
+    ) {
+
+        // Include the fuel controller
+        require_once __DIR__ . '/../controller/fuel_controller.php';
+
+        // ── Maintenance ────────────────────────────────────────────────────────────
+    } elseif (
+        isset($_POST['add_maintenance']) || isset($_POST['update_maintenance'])
+        || isset($_POST['deactivate_maintenance']) || isset($_POST['delete_maintenance'])
+    ) {
+
+        // Include the maintenance controller
+        require_once __DIR__ . '/../controller/maintenance_controller.php';
+
+        // ── Services ──────────────────────────────────────────────────────
+    } elseif (
+        isset($_POST['add_service']) || isset($_POST['update_service'])
+        || isset($_POST['deactivate_service']) || isset($_POST['delete_service'])
+    ) {
+
+        // Include the service controller
+        require_once __DIR__ . '/../controller/service_controller.php';
+
+        // ── Vendors ────────────────────────────────────────────────────────────────
+    } elseif (
+        isset($_POST['add_vendor']) || isset($_POST['update_vendor'])
+        || isset($_POST['deactivate_vendor']) || isset($_POST['delete_vendor'])
+    ) {
+
+        // Include the vendor controller
+        require_once __DIR__ . '/../controller/vendor_controller.php';
+
+
+        // ── Users ──────────────────────────────────────────────────────────────────
+    } elseif (
+        isset($_POST['add_user']) || isset($_POST['update_user'])
+        || isset($_POST['delete_user']) || isset($_POST['deactivate_user'])
+    ) {
+
+        // Include the user controller
+        require_once __DIR__ . '/../controller/user_controller.php';
     }
 
 }
 
+
 /**
- * Vendors
+ * Format a 10-digit phone number as (XXX)-XXX-XXXX.
+ * Returns the original string if it is not 10 digits.
+ *
+ * @param string|null $phone
+ * @return string
  */
-function renderVendorsTable(PDO $db)
+function formatPhone(?string $phone): string
 {
-    $stmt = $db->query("
-        SELECT v.vendor_id, v.vendor_name, v.vendor_city, v.vendor_state,
-               v.vendor_phone, v.vendor_email, v.is_active
-        FROM vendors v
-        ORDER BY v.vendor_name ASC
-    ");
-
-    $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt->closeCursor();
-
-    $columns = [
-        'vendor_name' => 'Name',
-        'vendor_city' => 'City',
-        'vendor_state' => 'State',
-        'vendor_phone' => 'Phone',
-        'vendor_email' => 'Email'
-    ];
-
-    renderTable($vendors, $columns);
+    if (!$phone) return '';
+    $digits = preg_replace('/\D/', '', $phone);
+    if (strlen($digits) !== 10) return $phone;
+    return sprintf("(%s)-%s-%s", substr($digits, 0, 3), substr($digits, 3, 3), substr($digits, 6));
 }
+
+

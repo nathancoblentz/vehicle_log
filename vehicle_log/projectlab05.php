@@ -1,78 +1,128 @@
-<!--
+<?php
+/*
     Jonathan Coblentz
     CPT283: PHP Programming
     Final Project: Vehicle Maintenance Log
     
-    This project is a web-based application for logging and tracking vehicle maintenance and fuel records. It includes user authentication, CRUD operations for vehicles, maintenance types, maintenance records, and fuel records. The application is built using PHP, MySQL, and Bootstrap for styling.
+    This project is a web-based application for logging and tracking vehicle maintenance and fuel records.
+    It includes user authentication, CRUD operations for vehicles, services, maintenance records, and fuel records.
     
-    Lab 05 focuses on navigation.
-    
-    -->
-<?php
+    Lab 05 focuses on Navigation, Landing Page, and tabbed Table interfaces.
+*/
 
-require 'config.php'; // Database connection
-include_once 'includes/functions.php'; // For renderVehiclesTable, renderFuelTable, renderMaintenanceTable
+$title = 'Lab 05 | Navigation & Interface Elements';
+$showHero = true;
+$requireAuth = true;
+require_once 'includes/header_bundle.php';
+include_once 'includes/functions.php';
 
-$feedback = null; // To store success/error messages for display in the UI
+$feedback = null;
 
 // PROCESS FORM SUBMISSIONS
-
-// Form handlers, and modals are included in this file so they are available on the same page as the dashboard for better user experience and feedback display.  They are defined in functions.php and the actual processing logic is in the controler/ directory. This keeps the code organized and modular while still allowing for dynamic feedback on the same page.
-
 addHandlers();
-
-$title = 'Lab 05 | Navigation and Interface Elements';
-include_once '../includes/head.php';
-include_once '../includes/nav.php';
-include_once '../includes/hero.php';
 ?>
 
+<div class="container mt-5">
 
-
-<div class="container">
+    <!-- HEADER CARD -->
     <div class="card mb-4 border-0 shadow-sm">
         <div class="card-header bg-primary text-white py-3">
-            <span class="badge bg-light text-primary me-2">Lab 05</span>
+            <span class="badge bg-white text-primary me-2">Lab 05</span>
             <h5 class="d-inline mb-0">Navigation and Interface Elements</h5>
         </div>
         <div class="card-body">
-            <p class="lead">
-                This lab builds focuses of navigation and interface elements for the vehicle log database.  I've added a landing page to welcome the user to the the app, a 'Table' page with bootstrap vertical pill style navigation to switch between Vehicle, Vendor, Maintenance, Fuel, and Maintenance Type tables.  Each table has a search area for the user to search by any relevant keywords; the fuel and maintenance records allow the user to search by a date range or cost range.  Each table includes an Add button, and each table row includes an edit and delete button, that trigger a Bootstrap modal for the user to add or edit a record.  The Vehicle, Maintenance Type and Vendor tables also include an 'Info' page that allows the user to drill down for more details about an individual record, with reports showing fuel and maintenance logs for an individaul vehicle, maintenance records by vendor, or records of each service type.
+            <p class="lead mb-2">Enhancing User Workflow &mdash; Landing Pages &amp; Tabs</p>
+            <p class="text-muted mb-0 small">
+                Implementation of a comprehensive navigation system featuring a dedicated Landing Page and a tabbed "Table View." Using Bootstrap vertical pills and session storage, the interface now persists the user's active table focus across page reloads and form submissions.
             </p>
-            <ul class="list-group">
-                <li class="list-group-item"><a href="landing_page.php"></a></li>
-                <li class="list-group-item"><a href="table.php">Table View</a></li>
-                <li class="list-group-item"><a href="vehicle_info.php">Vehicle Info Page</a></li>
-                <li class="list-group-item"><a href="vendor_info.php">Vendor Info Page</a></li>
-                <li class="list-group-item"><a href="maintenance_type_info.php">Maintenance Type Info Page</a></li>
-            </ul>
-                            
-                
         </div>
     </div>
 
+    <!-- CORE CHANNELS SECTION -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h3 class="text-primary mb-3">Refactored Navigation Nodes</h3>
+            <div class="row g-4 mb-4">
+                <?php 
+                    $navNodes = [
+                        ['Landing Page', 'landing_page.php', 'fa-house-chimney'],
+                        ['Table View', 'table.php', 'fa-table-list'],
+                        ['Information Center', 'info.php', 'fa-circle-info']
+                    ];
 
+                    foreach($navNodes as $node):
+                ?>
+                    <div class="col-md-6 col-lg-4">
+                        <a href="<?= $node[1] ?>" class="card h-100 border transition-hover text-decoration-none bg-white">
+                            <div class="card-body d-flex align-items-center">
+                                <span class="bg-primary bg-opacity-10 text-primary p-3 rounded me-3 shadow-sm">
+                                    <i class="fa-solid <?= $node[2] ?> fa-lg"></i>
+                                </span>
+                                <div class="text-dark">
+                                    <h6 class="mb-0 fw-bold"><?= $node[0] ?></h6>
+                                    <p class="small text-muted mb-0">System Node &mdash;</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
 
+            <p class="small text-muted mb-0">
+                <i class="fa-solid fa-circle-check text-success me-1"></i>
+                <strong>Session Persistence:</strong> Integrated <code>sessionStorage</code> to bookmark the active table tab (Vehicle, Vendor, Maintenance, etc.).
+            </p>
+        </div>
+    </div>
 
-
+    <!-- UI/UX FEATURES SECTION -->
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body">
+            <h3 class="text-primary mb-3">UI/UX Implementation Focus</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover small">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 25%;">Feature</th>
+                            <th>Description</th>
+                            <th style="width: 25%;">Methodology</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Vertical Pill Navigation</td>
+                            <td>Dynamic switching between Vehicles, Vendors, Maintenance, and Fuel tables.</td>
+                            <td>Bootstrap 5.3 Pills</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Smart Search Engine</td>
+                            <td>Context-aware search for dates, cost ranges, or keyword filtering across logs.</td>
+                            <td>Filtered SQL Views</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Master-Detail Views</td>
+                            <td>Drill-down reports for individual vehicles, detailing their specific log history.</td>
+                            <td>Parameterized Routing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
 </div>
 
-
-
-<!-- FORM MODALS -->
+<!-- OVERLAY COMPONENTS -->
 <?php addForms(); ?>
-
-<!-- FEEDBACK MODAL -->
 <?php addFeedback(); ?>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Restore active tab from sessionStorage
+        // Restore active tab from sessionStorage for Lab 05 context
         var activeTabSelector = sessionStorage.getItem('activeTab_projectlab05');
         if (activeTabSelector) {
             var activeTabEl = document.querySelector(activeTabSelector);
-            if (activeTabEl) {
+            if (activeTabEl && typeof bootstrap !== 'undefined' && bootstrap.Tab) {
                 var tab = new bootstrap.Tab(activeTabEl);
                 tab.show();
             }

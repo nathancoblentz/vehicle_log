@@ -9,16 +9,10 @@ Edit Fuel page — search for a vehicle by any field and display results with ed
 -->
 <?php
 
-require 'config.php';
-include_once 'includes/functions.php';
-
-$feedback = null;
-addHandlers();
-
-$title = 'Edit Vehicle';
-include_once '../includes/head.php';
-include_once '../includes/nav.php';
-include_once '../includes/hero.php';
+$title = 'Edit Fuel';
+$showHero = true;
+$requireAuth = true;
+require_once 'includes/header_bundle.php';
 ?>
 
 <div class="container mt-4">
@@ -220,8 +214,8 @@ include_once '../includes/hero.php';
                                     <!-- Edit Button -->
                                     <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editFuelModal"
                                         data-fuel-id="<?= $v['fuel_id'] ?>" data-vehicle-id="<?= $v['vehicle_id'] ?>"
-                                        data-fuel-date="<?= htmlspecialchars($v['fuel_date'] ?? '') ?>"
-                                        data-fuel-mileage="<?= htmlspecialchars($v['fuel_mileage'] ?? '') ?>"
+                                        data-fuel-date="<?= htmlspecialchars(substr((string)($v['fuel_date'] ?? ''), 0, 10)) ?>"
+                                        data-fuel-mileage="<?= round((float)($v['fuel_mileage'] ?? 0)) ?>"
                                         data-fuel-payment-method="<?= htmlspecialchars($v['fuel_payment_method'] ?? '') ?>"
                                         data-fuel-gallons="<?= htmlspecialchars($v['fuel_gallons'] ?? '') ?>"
                                         data-fuel-cost-per-gallon="<?= htmlspecialchars($v['fuel_cost_per_gallon'] ?? '') ?>"
@@ -232,13 +226,12 @@ include_once '../includes/hero.php';
                                         title="Edit Fuel Record"><span class="fas fa-edit"></span></button>
 
                                     <!-- Delete Button -->
-                                    <form method="POST" class="d-inline"
-                                        onsubmit="return confirm('Are you sure you want to delete this fuel log entry?');">
-                                        <input type="hidden" name="delete_fuel" value="1">
-                                        <input type="hidden" name="fuel_id" value="<?= $v['fuel_id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete Fuel Record"><span
-                                                class="fa-regular fa-trash-can"></span></button>
-                                    </form>
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteFuelModal"
+                                        data-fuel-id="<?= $v['fuel_id'] ?>"
+                                        data-fuel-name="<?= htmlspecialchars($v['fuel_date_formatted'] . ' (' . $v['vehicle_full'] . ')') ?>"
+                                        title="Delete Fuel Record">
+                                        <span class="fa-regular fa-trash-can"></span>
+                                    </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

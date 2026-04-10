@@ -8,16 +8,10 @@ edit_fuel.php
 Edit Maintenance page — search for a vehicle by any field and display results with edit/delete buttons.
 */
 
-require 'config.php';
-include_once 'includes/functions.php';
-
-$feedback = null;
-addHandlers();
-
-$title = 'Edit Maintenance Record';
-include_once '../includes/head.php';
-include_once '../includes/nav.php';
-include_once '../includes/hero.php';
+$title = 'Edit Maintenance';
+$showHero = true;
+$requireAuth = true;
+require_once 'includes/header_bundle.php';
 ?>
 
 <div class="container mt-4">
@@ -26,7 +20,7 @@ include_once '../includes/hero.php';
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
             <div>
-                <h3 class="d-inline mb-0"><span class="fas fa-wrench me-3"></span>Maintenance Records</h3>
+                <h3 class="d-inline mb-0"><span class="fas fa-wrench me-3"></span>Maintenance Logs</h3>
             </div>
             <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addMaintenanceModal"
                 title="Add Maintenance Record">
@@ -228,9 +222,9 @@ include_once '../includes/hero.php';
                                     <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#editMaintenanceModal" data-maintenance-id="<?= $v['maintenance_id'] ?>"
                                         data-vehicle-id="<?= $v['vehicle_id'] ?>"
-                                        data-maintenance-type-id="<?= htmlspecialchars($v['maintenance_type_id'] ?? '') ?>"
-                                        data-maintenance-date="<?= htmlspecialchars($v['maintenance_date'] ?? '') ?>"
-                                        data-maintenance-mileage="<?= htmlspecialchars($v['maintenance_mileage'] ?? '') ?>"
+                                        data-service-id="<?= htmlspecialchars($v['maintenance_type_id'] ?? '') ?>"
+                                        data-maintenance-date="<?= htmlspecialchars(substr((string)($v['maintenance_date'] ?? ''), 0, 10)) ?>"
+                                        data-maintenance-mileage="<?= round((float)($v['maintenance_mileage'] ?? 0)) ?>"
                                         data-maintenance-cost="<?= htmlspecialchars($v['maintenance_cost'] ?? '') ?>"
                                         data-vendor-id="<?= htmlspecialchars($v['vendor_id'] ?? '') ?>"
                                         data-maintenance-description="<?= htmlspecialchars($v['maintenance_description'] ?? '') ?>"
@@ -240,13 +234,12 @@ include_once '../includes/hero.php';
                                     </button>
 
                                     <!-- Delete Button -->
-                                    <form method="POST" class="d-inline"
-                                        onsubmit="return confirm('Are you sure you want to delete this maintenance record entry?');">
-                                        <input type="hidden" name="delete_maintenance" value="1">
-                                        <input type="hidden" name="maintenance_id" value="<?= $v['maintenance_id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete Record"><span
-                                                class="fa-regular fa-trash-can"></span></button>
-                                    </form>
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteMaintenanceModal" data-maintenance-id="<?= $v['maintenance_id'] ?>"
+                                        data-maintenance-name="<?= htmlspecialchars($v['maintenance_description'] ? $v['maintenance_description'] : $v['vehicle_full']) ?>"
+                                        title="Delete Record">
+                                        <span class="fa-regular fa-trash-can"></span>
+                                    </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

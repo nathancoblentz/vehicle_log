@@ -2,13 +2,12 @@
 // vendor_info.php — Displays vendor details and associated maintenance records
 
 require 'config.php';
-include_once 'includes/functions.php';
-
 $title = "Vendor Info";
-
-include_once '../includes/head.php';
-include_once '../includes/nav.php';
-include_once '../includes/hero.php';
+$hideNav = true; 
+$requireAuth = true;
+require_once 'includes/header_bundle.php';
+include_once 'includes/functions.php';
+addHandlers();
 
 // Fetch all vendors for the dropdown
 $stmt = $db->query("SELECT vendor_id, vendor_name FROM vendors ORDER BY vendor_name");
@@ -50,6 +49,16 @@ if ($vendor_id) {
 ?>
 
 <div class="container mt-4">
+    <!-- logged in user right align -->
+    <div class="d-flex justify-content-end align-items-center py-3">
+        <span class="text-muted me-2">
+            <i class="fa-solid fa-user-circle me-1"></i>
+            You are logged in as <strong><?= htmlspecialchars($_SESSION['user']['name'] ?? 'System User') ?></strong>.
+        </span>
+        <a class="btn btn-outline-secondary btn-sm" href="<?= $baseURL ?>vehicle_log/logout.php">
+            <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+        </a>
+    </div>
 
     <?php
     if ($vendor) {
@@ -60,12 +69,7 @@ if ($vendor_id) {
     }
     ?> <!-- Back Button & Vendor Selection Dropdown -->
     <div class="row mb-3 align-items-center">
-        <div class="col-md-6">
-            <a href="edit_vendors.php" class="btn btn-outline-secondary">
-                <i class="fa-solid fa-arrow-left me-1"></i> Back to Vendor List
-            </a>
-        </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <div class="col-12 text-end mt-3 mt-md-0">
             <form action="vendor_info.php" method="GET" class="d-inline-block shadow-sm" style="min-width: 250px;">
                 <div class="input-group">
                     <span class="input-group-text bg-primary text-white border-primary"><i
@@ -78,6 +82,20 @@ if ($vendor_id) {
                             </option>
                         <?php endforeach; ?>
                     </select>
+                    <?php if ($vendor_id && $vendor): ?>
+                        <button type="button" class="btn btn-warning border-primary" data-bs-toggle="modal"
+                            data-bs-target="#editVendorModal" data-vendor-id="<?= $vendor['vendor_id'] ?>"
+                            data-vendor-name="<?= htmlspecialchars($vendor['vendor_name'] ?? '') ?>"
+                            data-vendor-address="<?= htmlspecialchars($vendor['vendor_address'] ?? '') ?>"
+                            data-vendor-city="<?= htmlspecialchars($vendor['vendor_city'] ?? '') ?>"
+                            data-vendor-state="<?= htmlspecialchars($vendor['vendor_state'] ?? '') ?>"
+                            data-vendor-zip="<?= htmlspecialchars($vendor['vendor_zip'] ?? '') ?>"
+                            data-vendor-phone="<?= htmlspecialchars($vendor['vendor_phone'] ?? '') ?>"
+                            data-vendor-email="<?= htmlspecialchars($vendor['vendor_email'] ?? '') ?>"
+                            data-is-active="<?= $vendor['is_active'] ?? 1 ?>" title="Edit This Vendor">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    <?php endif; ?>
                 </div>
             </form>
         </div>
@@ -131,7 +149,7 @@ if ($vendor_id) {
                             </td>
                             <th class="table-dark">Phone</th>
                             <td>
-                                <?= htmlspecialchars($vendor['vendor_phone'] ?? '') ?>
+                                <?= htmlspecialchars(formatPhone($vendor['vendor_phone'] ?? '')) ?>
                             </td>
                         </tr>
                         <tr>
@@ -247,4 +265,7 @@ if ($vendor_id) {
 
 </div>
 
-<?php include_once('../includes/footer.php'); ?>
+<?php
+addForms();
+addFeedback();
+include_once('../includes/footer.php'); ?>

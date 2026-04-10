@@ -1,7 +1,39 @@
+/* ==========================================================================
+   Base Design System / Variables
+   ========================================================================== */
+:root {
+    --bs-border-radius: 0.5rem; /* Restore global roundness */
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    
+    
+}
+
+/* ==========================================================================
+   Navigation Pills
+   ========================================================================== */
 #v-pills-tab .nav-link {
-    border-radius:0;
-    height:100px;
-    width:100px;
+    border-radius: 12px !important;
+    height: 105px;
+    width: 105px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#v-pills-tab .nav-link .tab-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-top: 0.6rem;
+    text-align: center;
+    line-height: 1.2;
+    transition: all 0.3s ease;
 }
 
 #v-pills-tabContent {
@@ -13,24 +45,183 @@
     margin-top: 0 !important;
 }
 
-* {
-    border-radius:0 !important;
-}
-
-/* Smooth hover transition for all tabs */
-#v-pills-tab .nav-link {
-    transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* Hover effect only on inactive tabs */
+/* Hover and Interactions */
 #v-pills-tab .nav-link:not(.active):hover {
-    background: var(--bs-primary);
-    cursor: pointer; /* pointer only for hoverable tabs */
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
 }
 
-/* Active tab styling */
+/* Active State with Depth */
 #v-pills-tab .nav-link.active {
-    background: var(--bs-info);
-    color: #fff;           /* ensure text is readable */
-    cursor: default;       /* no pointer for active tab */
+    background: var(--bs-primary);
+    color: #fff;
+    cursor: default;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    transform: translateY(-4px);
+    position: relative;
+    z-index: 1;
+}
+
+#v-pills-tab .nav-link.active::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.5); /* Boost glow with primary color roughly, though custom theme might change this */
+    z-index: -1;
+    pointer-events: none;
+}
+
+
+span.tab-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  position:absolute;
+  bottom: 1rem;
+  
+  line-height: 1.2;
+  ;
+  display: none; // Hidden by default
+}
+
+button.nav-link {
+  &:hover {
+    .tab-label {
+      display: block; // Shows the label when the button is hovered
+    }
+  }
+}
+
+
+button.nav-link {
+  &:hover {
+    .tab-label {
+      display: block; // Shows the label when the button is hovered
+    }
+  }
+
+  &.active {
+    .tab-label {
+      display: block; // Shows the label when the button is active
+    }
+  }
+}
+
+
+
+
+/* ==========================================================================
+   Data Tables Modernization
+   ========================================================================== */
+.table-responsive {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); 
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: #252525;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table > thead > tr > th {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Row Hover Lift */
+.table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    cursor: pointer;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+    padding: 1rem;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================================================
+   Forms & Modals (Glassmorphism touches)
+   ========================================================================== */
+.modal-content {
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+}
+
+.modal-header {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease-in-out;
+    color:white;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+    border-color: var(--bs-primary);
+    background-color: rgba(0, 0, 0, 0.3);
+    color:white;
+}
+
+/* ==========================================================================
+   Status Badges (Neon aesthetic)
+   ========================================================================== */
+.badge.glow-success {
+    background-color: rgba(32, 201, 151, 0.15) !important;
+    color: #20c997 !important;
+    border: 1px solid rgba(32, 201, 151, 0.4);
+    font-weight: 600;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+}
+
+.badge.glow-danger {
+    background-color: rgba(255, 107, 107, 0.15) !important;
+    color: #ff6b6b !important;
+    border: 1px solid rgba(255, 107, 107, 0.4);
+    font-weight: 600;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+}
+
+/* ==========================================================================
+   Styling for login page
+   ========================================================================== */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+}
+.icon-circle {
+    width: 70px;
+    height: 70px;
+    font-size: 2.2rem;
 }

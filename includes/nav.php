@@ -7,7 +7,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo $baseURL; ?>#exercises">Murach Exercises</a>
                 </li>
@@ -17,6 +17,21 @@
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo $baseURL; ?>#project">Project Labs</a>
                 </li>
+
+                <?php 
+                // Display the logged-in user's name and a logout link if authenticated
+                if (session_status() === PHP_SESSION_NONE) { session_start(); }
+                if (isset($_SESSION['user'])): ?>
+                    <li class="nav-item ms-lg-3 border-start ps-lg-3 py-2 py-lg-0">
+                        <span class="navbar-text text-white small me-2">
+                            <i class="fa-solid fa-user-circle me-1"></i>
+                            Welcome, <strong><?= htmlspecialchars($_SESSION['user']['name']) ?></strong>
+                        </span>
+                        <a class="btn btn-outline-light btn-sm" href="<?= $baseURL ?>vehicle_log/logout.php">
+                            <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                        </a>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>
